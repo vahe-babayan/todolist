@@ -1,0 +1,26 @@
+#wrapper {
+    width: 600px;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#wrapper .top-buttons {
+    display: flex;
+}
+
+#wrapper .top-buttons a:last-child {
+    margin-left: auto;
+}
+
+.list-pagination nav ul {
+    justify-content: center;
+}
+
+/* .list-pagination .page-link-double-left,
+.list-pagination .page-link-left,
+.list-pagination .page-link-double-right,
+.list-pagination .page-link-right {
+    padding-top: 10px;
+    padding-bottom: 10px;
+} */
