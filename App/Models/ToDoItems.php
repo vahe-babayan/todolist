@@ -20,7 +20,7 @@ class ToDoItems extends Model
         if ($id) {
             $this->id = (int)$id;
 
-            $sql = 'SELECT id, name, email, task, status, edit_by_admin, created_at FROM todolist WHERE id=' . $this->id . ' LIMIT 1';
+            $sql = sprintf('SELECT id, name, email, task, status, edit_by_admin, created_at FROM todolist WHERE id=%d LIMIT 1', $this->id);
 
             $item = DB::getInstance()->query($sql)->fetch_assoc();
 
@@ -34,10 +34,10 @@ class ToDoItems extends Model
 
     public function getItems($limit = null, $offset = 0, $sort_by = 'name', $sort_by_order = 'ASC')
     {
-        $sql = 'SELECT id, name, email, task, status, edit_by_admin, created_at FROM todolist ORDER BY ' . $sort_by . ' ' . $sort_by_order;
+        $sql = sprintf('SELECT id, name, email, task, status, edit_by_admin, created_at FROM todolist ORDER BY %s %s', $sort_by, $sort_by_order);
 
         if ($limit) {
-            $sql .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
+            $sql .= sprintf(' LIMIT %d OFFSET %d', $limit, $offset);
         }
 
         return DB::getInstance()->query($sql)->fetch_all(MYSQLI_ASSOC);
@@ -51,14 +51,13 @@ class ToDoItems extends Model
     public function save()
     {
         if ($this->id) {
-            $sql = 'UPDATE todolist
-                    SET name=\'' .  $this->name . '\', email=\'' .  $this->email . '\', task=\'' .  $this->task . '\', status=\'' .  $this->status . '\', edit_by_admin=\'' .  $this->edit_by_admin . '\'
-                    WHERE id=' . $this->id;
+            $stmt = DB::getInstance()->prepare('UPDATE todolist SET name=?, email=?, task=?, status=?, edit_by_admin=? WHERE id=?');
+            $stmt->bind_param("sssiii", $this->name, $this->email, $this->task, $this->status, $this->edit_by_admin, $this->id);
         } else {
-            $sql = 'INSERT INTO todolist (name, email, task, status)
-                    VALUES (\'' . $this->name . '\', \'' . $this->email . '\', \'' . $this->task . '\', \'' . $this->status . '\')';
+            $stmt = DB::getInstance()->prepare('INSERT INTO todolist (name, email, task, status) VALUES (?, ?, ?, ?)');
+            $stmt->bind_param("sssi", $this->name, $this->email, $this->task, $this->status);
         }
 
-        DB::getInstance()->query($sql);
+        $stmt->execute();
     }
 }
